@@ -1,0 +1,27 @@
+:root {
+  --bg: #f5f6fa;
+  --card: #ffffff;
+  --text: #20233c;
+  --muted: #737b98;
+  --border: #e6e9f2;
+  --radius: 22px;
+  --shadow: 0 2px 5px rgba(30, 35, 64, 0.035), 0 14px 34px rgba(30, 35, 64, 0.065);
+  --primary: #173b5f;
+  --primary-soft: #eaf1f8;
+
+  --study: #214d76;       --study-soft: #eaf1f8;   /* Navy */
+  --documents: #284e72;   --documents-soft: #edf3f9;
+  --rhythm: #098b6c;      --rhythm-soft: #e8f7f1;  /* Emerald */
+  --rest: #d97706;        --rest-soft: #fff4df;    /* Amber */
+  --relax: #dc3159;       --relax-soft: #ffedf1;   /* Rose */
+  --ai: #7651d6;          --ai-soft: #f2edff;      /* Violet */
+  --dash: #34415a;        --dash-soft: #edf1f7;
+}
+
+.zone-study { --accent: var(--study); --accent-soft: var(--study-soft); }
+.zone-rhythm { --accent: var(--rhythm); --accent-soft: var(--rhythm-soft); }
+.zone-rest { --accent: var(--rest); --accent-soft: var(--rest-soft); }
+.zone-relax { --accent: var(--relax); --accent-soft: var(--relax-soft); }
+.zone-ai { --accent: var(--ai); --accent-soft: var(--ai-soft); }
+.zone-dash { --accent: var(--dash); --accent-soft: var(--dash-soft); }
+.zone-documents { --accent: var(--documents); --accent-soft: var(--documents-soft); }
