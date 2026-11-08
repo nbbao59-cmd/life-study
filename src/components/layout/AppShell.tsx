@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import SoundboardWidget from '../soundboard/SoundboardWidget';
 
 interface Props {
   sidebar: ReactNode;
@@ -15,6 +16,7 @@ export default function AppShell({ sidebar, header, zone, children }: Props) {
         {header}
         <main className={`content ${zone}`}>{children}</main>
       </div>
+      <SoundboardWidget />
     </div>
   );
 }
