@@ -1,10 +1,10 @@
 import http from 'node:http';
 import { config, isKeyConfigured } from './config.js';
 import { ApiError } from './errors.js';
-import { askGemini } from './gemini.js';
-import { buildContents, buildSystemInstruction } from './prompt.js';
+import { askGemini, askGeminiWithParts, generateStructuredCards } from './gemini.js';
+import { buildContents, buildDocumentContents, buildDocumentSystemInstruction, buildSystemInstruction } from './prompt.js';
 import { createRateLimiter, isOriginAllowed, readJson, sendJson } from './utils.js';
-import { parseChatRequest } from './validate.js';
+import { parseChatRequest, parseDocumentChatRequest, parseGenerateCardsRequest } from './validate.js';
 
 const limited = createRateLimiter(config.rateLimitPerMinute);
 
@@ -51,6 +51,41 @@ const server = http.createServer(async (req, res) => {
         contents: buildContents(history, message),
       });
       return sendJson(res, 200, { reply }, cors);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/document-chat') {
+      if (!isKeyConfigured()) {
+        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY. Hãy tạo file .env từ .env.example, điền GEMINI_API_KEY rồi khởi động lại backend.');
+      }
+      const wait = limited(req.socket.remoteAddress ?? 'unknown');
+      if (wait) {
+        res.setHeader('Retry-After', String(wait));
+        throw new ApiError(429, 'RATE_LIMITED', `Bạn gửi quá nhanh. Vui lòng thử lại sau ${wait} giây.`);
+      }
+
+      const body = await readJson(req, 25_000_000);
+      const { message, history, file } = parseDocumentChatRequest(body);
+      const reply = await askGeminiWithParts({
+        system: buildDocumentSystemInstruction(file),
+        contents: buildDocumentContents({ history, message, file }),
+      });
+      return sendJson(res, 200, { reply }, cors);
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/generate-cards') {
+      if (!isKeyConfigured()) {
+        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY. Hãy tạo file .env từ .env.example, điền GEMINI_API_KEY rồi khởi động lại backend.');
+      }
+      const wait = limited(req.socket.remoteAddress ?? 'unknown');
+      if (wait) {
+        res.setHeader('Retry-After', String(wait));
+        throw new ApiError(429, 'RATE_LIMITED', `Bạn gửi quá nhanh. Vui lòng thử lại sau ${wait} giây.`);
+      }
+
+      const body = await readJson(req, 25_000_000);
+      const { file, count } = parseGenerateCardsRequest(body);
+      const result = await generateStructuredCards({ file, count });
+      return sendJson(res, 200, { ok: true, data: result }, cors);
     }
 
     throw new ApiError(404, 'NOT_FOUND', 'Không tìm thấy.');

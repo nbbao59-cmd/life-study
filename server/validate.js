@@ -54,3 +54,58 @@ export function parseChatRequest(body) {
     },
   };
 }
+
+/** Chuẩn hóa và kiểm tra tệp tài liệu (PDF/ảnh dạng base64 hoặc nội dung văn bản trích xuất). */
+export function parseFilePayload(file) {
+  if (!file || typeof file !== 'object') {
+    throw new ApiError(400, 'BAD_REQUEST', 'Thiếu thông tin tệp tài liệu.');
+  }
+
+  const name = str(file.name, 255) || 'Tài liệu';
+  const mimeType = str(file.mimeType, 120) || 'application/octet-stream';
+
+  let base64Data = typeof file.base64Data === 'string' ? file.base64Data : (typeof file.data === 'string' ? file.data : '');
+  if (base64Data) {
+    base64Data = base64Data.replace(/^data:[^;]+;base64,/, '').trim();
+    if (base64Data.length > 35 * 1024 * 1024) {
+      throw new ApiError(413, 'PAYLOAD_TOO_LARGE', 'Kích thước tệp tải lên quá lớn (tối đa ~25MB).');
+    }
+  }
+
+  const textData = typeof file.textData === 'string' ? file.textData.slice(0, 100_000) : (typeof file.text === 'string' ? file.text.slice(0, 100_000) : '');
+
+  if (!base64Data && !textData) {
+    throw new ApiError(400, 'BAD_REQUEST', 'Tài liệu không có nội dung văn bản hoặc dữ liệu tệp.');
+  }
+
+  return { name, mimeType, base64Data, textData };
+}
+
+/** Xác thực yêu cầu hỏi đáp tài liệu /api/document-chat */
+export function parseDocumentChatRequest(body) {
+  if (!body || typeof body !== 'object') throw new ApiError(400, 'BAD_REQUEST', 'Yêu cầu không hợp lệ.');
+
+  const message = str(body.message, 4000);
+  if (!message) throw new ApiError(400, 'BAD_REQUEST', 'Thiếu nội dung câu hỏi.');
+
+  const history = list(body.history, 20)
+    .map((h) => ({
+      role: h?.role === 'assistant' || h?.role === 'model' ? 'model' : 'user',
+      text: str(h?.text, 4000),
+    }))
+    .filter((h) => h.text);
+
+  const file = parseFilePayload(body.file);
+
+  return { message, history, file };
+}
+
+/** Xác thực yêu cầu sinh thẻ ôn tập /api/generate-cards */
+export function parseGenerateCardsRequest(body) {
+  if (!body || typeof body !== 'object') throw new ApiError(400, 'BAD_REQUEST', 'Yêu cầu không hợp lệ.');
+
+  const file = parseFilePayload(body.file);
+  const count = num(body.count, 3, 30, 10);
+
+  return { file, count };
+}
