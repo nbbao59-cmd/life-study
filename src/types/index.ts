@@ -54,3 +54,32 @@ export interface AiContext {
   tasks: Task[];
   rhythm: RhythmItem[];
 }
+
+export type SoundChannelId = 'rain' | 'waves' | 'whiteNoise' | 'brownNoise' | 'cafe' | 'campfire' | 'birds';
+
+export interface SoundChannelConfig {
+  id: SoundChannelId;
+  name: string;
+  icon: string;
+  volume: number; // 0 - 100
+  enabled: boolean;
+}
+
+export interface PomodoroSession {
+  id: string;
+  goal: string;
+  mode: 'focus' | 'short' | 'long';
+  durationMinutes: number;
+  completedAt: string; // ISO string
+}
+
+export interface QuickChecklistItem {
+  id: string;
+  text: string;
+  done: boolean;
+}
+
+export interface QuickNotesState {
+  checklist: QuickChecklistItem[];
+  freeText: string;
+}
