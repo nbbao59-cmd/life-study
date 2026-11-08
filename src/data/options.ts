@@ -43,6 +43,7 @@ export const NAV: { id: SectionId; label: string; zone: string; hint: string }[]
   { id: 'dashboard', label: 'Tổng quan', zone: 'zone-dash', hint: 'Tiến độ hôm nay' },
   { id: 'study', label: 'Lịch học tập', zone: 'zone-study', hint: 'Bài tập & môn học' },
   { id: 'documents', label: 'Tài liệu', zone: 'zone-documents', hint: 'Tệp học tập của bạn' },
+  { id: 'flashcards', label: 'Ôn tập', zone: 'zone-study', hint: 'Flashcard 3D & Quiz' },
   { id: 'rhythm', label: 'Nhịp sinh học', zone: 'zone-rhythm', hint: 'Dòng thời gian' },
   { id: 'rest', label: 'Nghỉ ngơi', zone: 'zone-rest', hint: 'Pomodoro & giãn cơ' },
   { id: 'relaxation', label: 'Thư giãn', zone: 'zone-relax', hint: 'YouTube, sách, podcast' },

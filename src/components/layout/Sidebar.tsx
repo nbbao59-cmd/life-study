@@ -1,4 +1,4 @@
-import { BookOpen, Coffee, FileText, Headphones, HeartPulse, LayoutDashboard, Sparkles } from 'lucide-react';
+import { BookOpen, Coffee, FileText, GraduationCap, Headphones, HeartPulse, LayoutDashboard, Sparkles } from 'lucide-react';
 import { ReactNode } from 'react';
 import { NAV } from '../../data/options';
 import { SectionId } from '../../types';
@@ -7,6 +7,7 @@ const ICONS: Record<SectionId, ReactNode> = {
   dashboard: <LayoutDashboard size={18} />,
   study: <BookOpen size={18} />,
   documents: <FileText size={18} />,
+  flashcards: <GraduationCap size={18} />,
   rhythm: <HeartPulse size={18} />,
   rest: <Coffee size={18} />,
   relaxation: <Headphones size={18} />,

@@ -1,4 +1,4 @@
-export type SectionId = 'dashboard' | 'study' | 'documents' | 'rhythm' | 'rest' | 'relaxation' | 'assistant';
+export type SectionId = 'dashboard' | 'study' | 'documents' | 'flashcards' | 'rhythm' | 'rest' | 'relaxation' | 'assistant';
 export type Priority = 'high' | 'medium' | 'low';
 export type Mood = 'great' | 'good' | 'ok' | 'tired' | 'stressed';
 
@@ -82,4 +82,59 @@ export interface QuickChecklistItem {
 export interface QuickNotesState {
   checklist: QuickChecklistItem[];
   freeText: string;
+}
+
+export interface Flashcard {
+  id: string;
+  question: string;
+  answer: string;
+  status?: 'new' | 'learning' | 'mastered';
+  lastReviewed?: string;
+}
+
+export interface QuizItem {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+export interface Deck {
+  id: string;
+  title: string;
+  sourceDocumentId?: string;
+  sourceDocumentName?: string;
+  summary?: string;
+  createdAt: string;
+  cards: Flashcard[];
+  quizzes: QuizItem[];
+}
+
+export interface DocumentChatRequest {
+  message: string;
+  history: Array<{ role: 'user' | 'assistant'; text: string }>;
+  file: {
+    name: string;
+    mimeType: string;
+    base64Data?: string;
+    textData?: string;
+  };
+}
+
+export interface GenerateCardsResponse {
+  deckTitle: string;
+  summary?: string;
+  flashcards: Array<{
+    id: string;
+    question: string;
+    answer: string;
+  }>;
+  quizzes: Array<{
+    id: string;
+    question: string;
+    options: string[];
+    correctIndex: number;
+    explanation: string;
+  }>;
 }
