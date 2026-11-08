@@ -1,25 +1,24 @@
 import {
-  ArrowLeft,
   BookOpen,
   Calendar,
   CheckCircle2,
-  Clock,
   Edit3,
   FileText,
   GraduationCap,
   HelpCircle,
   Layers,
   Plus,
-  RotateCw,
   Search,
   Sparkles,
   Trash2,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import PageTitle from '../../components/ui/PageTitle';
-import { deleteDeck, listDecks } from '../../services/flashcardStorage';
+import { deleteDeck, listDecks, updateCardStatus } from '../../services/flashcardStorage';
 import { Deck } from '../../types';
 import DeckModal from './DeckModal';
+import FlashcardStudyView from './FlashcardStudyView';
+import QuizStudyView from './QuizStudyView';
 
 export interface FlashcardsPageProps {
   onNavigateToDocuments?: () => void;
@@ -127,110 +126,27 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
     refreshDecks();
   };
 
-  // Màn hình Study placeholder (sẽ thay bằng FlashcardStudyView ở Task 6)
+  // Màn hình Study 3D Flip
   if (activeView === 'study' && selectedDeck) {
     return (
-      <div className="stack flashcards-page">
-        <div className="study-placeholder-header">
-          <button className="btn ghost sm" onClick={handleBackToList}>
-            <ArrowLeft size={16} /> Quay lại danh sách bộ thẻ
-          </button>
-          <div className="study-mode-indicator">
-            <Layers size={16} />
-            <span>Chế độ Lật thẻ ôn tập 3D</span>
-          </div>
-        </div>
-
-        <section className="card study-placeholder-card">
-          <div className="study-placeholder-badge">
-            <Sparkles size={16} /> Sắp ra mắt ở Task 6
-          </div>
-          <h2>{selectedDeck.title}</h2>
-          {selectedDeck.summary && <p className="muted">{selectedDeck.summary}</p>}
-
-          <div className="study-placeholder-meta">
-            <span>
-              <Layers size={16} /> {selectedDeck.cards.length} thẻ ghi nhớ
-            </span>
-            {selectedDeck.sourceDocumentName && (
-              <span>
-                <FileText size={16} /> {selectedDeck.sourceDocumentName}
-              </span>
-            )}
-          </div>
-
-          <div className="study-placeholder-box">
-            <div className="study-placeholder-icon">
-              <RotateCw size={36} />
-            </div>
-            <h3>Không gian ôn tập Spaced Repetition (Task 6)</h3>
-            <p>
-              Giao diện lật thẻ 3D mượt mà kèm 3 nút đánh giá cấp độ ghi nhớ:
-              <br />
-              <strong className="tag-red">Chưa thuộc</strong> &bull;{' '}
-              <strong className="tag-yellow">Hơi nhớ</strong> &bull;{' '}
-              <strong className="tag-green">Đã thuộc</strong>
-            </p>
-            <div className="study-placeholder-actions">
-              <button className="btn primary" onClick={handleBackToList}>
-                Quay lại quản lý Deck
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
+      <FlashcardStudyView
+        deck={selectedDeck}
+        onBack={handleBackToList}
+        onCardStatusChange={(cardId, st) => {
+          updateCardStatus(selectedDeck.id, cardId, st);
+          refreshDecks();
+        }}
+      />
     );
   }
 
-  // Màn hình Quiz placeholder (sẽ thay bằng QuizStudyView ở Task 6)
+  // Màn hình Quiz Trắc nghiệm
   if (activeView === 'quiz' && selectedDeck) {
     return (
-      <div className="stack flashcards-page">
-        <div className="study-placeholder-header">
-          <button className="btn ghost sm" onClick={handleBackToList}>
-            <ArrowLeft size={16} /> Quay lại danh sách bộ thẻ
-          </button>
-          <div className="study-mode-indicator quiz-indicator">
-            <HelpCircle size={16} />
-            <span>Chế độ Trắc nghiệm tương tác</span>
-          </div>
-        </div>
-
-        <section className="card study-placeholder-card">
-          <div className="study-placeholder-badge quiz-badge">
-            <Sparkles size={16} /> Sắp ra mắt ở Task 6
-          </div>
-          <h2>{selectedDeck.title}</h2>
-          {selectedDeck.summary && <p className="muted">{selectedDeck.summary}</p>}
-
-          <div className="study-placeholder-meta">
-            <span>
-              <HelpCircle size={16} /> {selectedDeck.quizzes?.length || 0} câu trắc nghiệm
-            </span>
-            {selectedDeck.sourceDocumentName && (
-              <span>
-                <FileText size={16} /> {selectedDeck.sourceDocumentName}
-              </span>
-            )}
-          </div>
-
-          <div className="study-placeholder-box">
-            <div className="study-placeholder-icon quiz-color">
-              <HelpCircle size={36} />
-            </div>
-            <h3>Hệ thống kiểm tra & chấm điểm tức thì (Task 6)</h3>
-            <p>
-              Làm trắc nghiệm 4 đáp án A/B/C/D, nhận diện đáp án Đúng/Sai với hiệu ứng màu sắc trực quan, kèm phần giải
-              thích chi tiết cho từng câu hỏi.
-            </p>
-            <div className="study-placeholder-actions">
-              <button className="btn primary" onClick={handleBackToList}>
-                Quay lại quản lý Deck
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
+      <QuizStudyView
+        deck={selectedDeck}
+        onBack={handleBackToList}
+      />
     );
   }
 
