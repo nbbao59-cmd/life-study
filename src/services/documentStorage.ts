@@ -23,7 +23,7 @@ function openDatabase(): Promise<IDBDatabase> {
   }
 
   if (!database) {
-    database = new Promise((resolve, reject) => {
+    database = new Promise<IDBDatabase>((resolve, reject) => {
       try {
         const request = indexedDB.open(DATABASE, 1);
         request.onupgradeneeded = () => {
@@ -45,7 +45,7 @@ function openDatabase(): Promise<IDBDatabase> {
     });
   }
 
-  return database;
+  return database!;
 }
 
 function requestValue<T>(mode: IDBTransactionMode, action: (store: IDBObjectStore) => IDBRequest<T>): Promise<T> {
