@@ -1,6 +1,7 @@
 import AppShell from '../components/layout/AppShell';
 import Header from '../components/layout/Header';
 import Sidebar from '../components/layout/Sidebar';
+import { SoundProvider } from '../context/SoundContext';
 import { NAV } from '../data/options';
 import { sampleRelax, sampleRhythm, sampleTasks, welcomeMessages } from '../data/sampleData';
 import AssistantChat from '../features/assistant/AssistantChat';
@@ -26,18 +27,20 @@ export default function App() {
   const zone = NAV.find((n) => n.id === section)?.zone ?? 'zone-dash';
 
   return (
-    <AppShell
-      zone={zone}
-      sidebar={<Sidebar active={section} onChange={setSection} />}
-      header={<Header section={section} energy={energy} mood={mood} onEnergy={setEnergy} onMood={setMood} />}
-    >
-      {section === 'dashboard' && <Dashboard tasks={tasks} rhythm={rhythm} energy={energy} mood={mood} water={water} />}
-      {section === 'study' && <StudyPlanner tasks={tasks} setTasks={setTasks} />}
-      {section === 'documents' && <DocumentLibrary />}
-      {section === 'rhythm' && <RhythmTimeline items={rhythm} setItems={setRhythm} />}
-      {section === 'rest' && <RestZone water={water} setWater={setWater} />}
-      {section === 'relaxation' && <RelaxationZone items={relax} setItems={setRelax} />}
-      {section === 'assistant' && <AssistantChat messages={messages} setMessages={setMessages} context={{ energy, mood, tasks, rhythm }} />}
-    </AppShell>
+    <SoundProvider>
+      <AppShell
+        zone={zone}
+        sidebar={<Sidebar active={section} onChange={setSection} />}
+        header={<Header section={section} energy={energy} mood={mood} onEnergy={setEnergy} onMood={setMood} />}
+      >
+        {section === 'dashboard' && <Dashboard tasks={tasks} rhythm={rhythm} energy={energy} mood={mood} water={water} />}
+        {section === 'study' && <StudyPlanner tasks={tasks} setTasks={setTasks} />}
+        {section === 'documents' && <DocumentLibrary />}
+        {section === 'rhythm' && <RhythmTimeline items={rhythm} setItems={setRhythm} />}
+        {section === 'rest' && <RestZone water={water} setWater={setWater} />}
+        {section === 'relaxation' && <RelaxationZone items={relax} setItems={setRelax} />}
+        {section === 'assistant' && <AssistantChat messages={messages} setMessages={setMessages} context={{ energy, mood, tasks, rhythm }} />}
+      </AppShell>
+    </SoundProvider>
   );
 }
