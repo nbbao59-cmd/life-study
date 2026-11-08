@@ -7,6 +7,7 @@ import { sampleRelax, sampleRhythm, sampleTasks, welcomeMessages } from '../data
 import AssistantChat from '../features/assistant/AssistantChat';
 import Dashboard from '../features/dashboard/Dashboard';
 import DocumentLibrary from '../features/documents/DocumentLibrary';
+import FlashcardsPage from '../features/flashcards/FlashcardsPage';
 import RelaxationZone from '../features/relaxation/RelaxationZone';
 import RestZone from '../features/rest/RestZone';
 import RhythmTimeline from '../features/rhythm/RhythmTimeline';
@@ -36,6 +37,7 @@ export default function App() {
         {section === 'dashboard' && <Dashboard tasks={tasks} rhythm={rhythm} energy={energy} mood={mood} water={water} />}
         {section === 'study' && <StudyPlanner tasks={tasks} setTasks={setTasks} />}
         {section === 'documents' && <DocumentLibrary onNavigate={setSection} />}
+        {section === 'flashcards' && <FlashcardsPage onNavigateToDocuments={() => setSection('documents')} />}
         {section === 'rhythm' && <RhythmTimeline items={rhythm} setItems={setRhythm} />}
         {section === 'rest' && <RestZone water={water} setWater={setWater} />}
         {section === 'relaxation' && <RelaxationZone items={relax} setItems={setRelax} />}
