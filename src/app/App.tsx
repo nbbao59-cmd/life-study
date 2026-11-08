@@ -35,7 +35,7 @@ export default function App() {
       >
         {section === 'dashboard' && <Dashboard tasks={tasks} rhythm={rhythm} energy={energy} mood={mood} water={water} />}
         {section === 'study' && <StudyPlanner tasks={tasks} setTasks={setTasks} />}
-        {section === 'documents' && <DocumentLibrary />}
+        {section === 'documents' && <DocumentLibrary onNavigate={setSection} />}
         {section === 'rhythm' && <RhythmTimeline items={rhythm} setItems={setRhythm} />}
         {section === 'rest' && <RestZone water={water} setWater={setWater} />}
         {section === 'relaxation' && <RelaxationZone items={relax} setItems={setRelax} />}
