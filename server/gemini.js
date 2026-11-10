@@ -3,6 +3,11 @@ import { ApiError } from './errors.js';
 
 const redact = (s) => (config.apiKey ? String(s).split(config.apiKey).join('[KEY]') : String(s));
 
+const CANDIDATE_MODELS = (primaryModel) => {
+  const models = [primaryModel, 'gemini-3.5-flash', 'gemini-3.5-flash-lite'].filter(Boolean);
+  return Array.from(new Set(models));
+};
+
 function mapUpstreamError(status, data) {
   const detail = redact(data?.error?.message || '');
   console.error(`[gemini] HTTP ${status}${detail ? `: ${detail}` : ''}`);
@@ -11,77 +16,98 @@ function mapUpstreamError(status, data) {
     return new ApiError(502, 'GEMINI_AUTH', 'GEMINI_API_KEY không hợp lệ hoặc không có quyền dùng Gemini API. Hãy kiểm tra lại key trong file .env rồi khởi động lại backend.');
   }
   if (status === 404) {
-    return new ApiError(502, 'GEMINI_MODEL', `Không tìm thấy model "${config.model}". Hãy đặt GEMINI_MODEL hợp lệ trong .env (xem danh sách model trên ai.google.dev).`);
+    return new ApiError(502, 'GEMINI_MODEL', `Không tìm thấy model hoặc model không còn được hỗ trợ.`);
   }
   if (status === 429) {
     return new ApiError(429, 'GEMINI_QUOTA', 'Gemini API báo hết hạn mức hoặc quá nhiều yêu cầu. Vui lòng thử lại sau ít phút.');
   }
   if (status >= 500) {
-    return new ApiError(502, 'GEMINI_UNAVAILABLE', 'Dịch vụ Gemini đang tạm thời không khả dụng. Vui lòng thử lại sau.');
+    return new ApiError(502, 'GEMINI_UNAVAILABLE', 'Dịch vụ Gemini đang tạm thời quá tải hoặc không khả dụng. Vui lòng thử lại sau.');
   }
   return new ApiError(502, 'GEMINI_BAD_REQUEST', 'Gemini từ chối yêu cầu. Xem nhật ký của backend để biết chi tiết.');
 }
 
 /**
- * Gọi Gemini generateContent bằng REST API, hỗ trợ multimodal (cả text và inlineData base64).
+ * Gọi Gemini generateContent bằng REST API, hỗ trợ multimodal (cả text và inlineData base64),
+ * kèm cơ chế tự động fallback model nếu model chính gặp lỗi 503 (quá tải) hoặc 404.
  */
 export async function askGeminiWithParts({ system, contents, timeoutMs = 60_000 }) {
-  const url = `${config.apiBase}/models/${encodeURIComponent(config.model)}:generateContent`;
-  const useThinking = Boolean(config.thinkingLevel && config.thinkingLevel !== 'none');
-  const generationConfig = { maxOutputTokens: 8192 };
-  if (useThinking) generationConfig.thinkingConfig = { thinkingLevel: config.thinkingLevel };
+  const models = CANDIDATE_MODELS(config.model);
+  let lastError;
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  let res;
-  let data;
-  try {
-    const request = async (includeThinking) => {
-      const bodyConfig = { maxOutputTokens: 8192 };
-      if (includeThinking) bodyConfig.thinkingConfig = generationConfig.thinkingConfig;
-      const bodyPayload = { contents, generationConfig: bodyConfig };
-      if (system) {
-        bodyPayload.systemInstruction = { parts: [{ text: system }] };
+  for (const modelName of models) {
+    const url = `${config.apiBase}/models/${encodeURIComponent(modelName)}:generateContent`;
+    const useThinking = Boolean(config.thinkingLevel && config.thinkingLevel !== 'none');
+    const generationConfig = { maxOutputTokens: 8192 };
+    if (useThinking) generationConfig.thinkingConfig = { thinkingLevel: config.thinkingLevel };
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    let res;
+    let data;
+
+    try {
+      const request = async (includeThinking) => {
+        const bodyConfig = { maxOutputTokens: 8192 };
+        if (includeThinking) bodyConfig.thinkingConfig = generationConfig.thinkingConfig;
+        const bodyPayload = { contents, generationConfig: bodyConfig };
+        if (system) {
+          bodyPayload.systemInstruction = { parts: [{ text: system }] };
+        }
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': config.apiKey },
+          body: JSON.stringify(bodyPayload),
+          signal: controller.signal,
+        });
+        return { response, body: await response.json().catch(() => null) };
+      };
+
+      let result = await request(useThinking);
+      const upstreamMessage = result.body?.error?.message ?? '';
+      if (useThinking && result.response.status === 400 && /think/i.test(upstreamMessage)) {
+        console.warn(`[gemini] ${modelName} rejected thinkingConfig; retrying without it.`);
+        result = await request(false);
       }
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': config.apiKey },
-        body: JSON.stringify(bodyPayload),
-        signal: controller.signal,
-      });
-      return { response, body: await response.json().catch(() => null) };
-    };
-
-    let result = await request(useThinking);
-    const upstreamMessage = result.body?.error?.message ?? '';
-    if (useThinking && result.response.status === 400 && /think/i.test(upstreamMessage)) {
-      console.warn(`[gemini] ${config.model} rejected thinkingConfig; retrying without it.`);
-      result = await request(false);
+      res = result.response;
+      data = result.body;
+    } catch (err) {
+      clearTimeout(timer);
+      if (err?.name === 'AbortError') {
+        lastError = new ApiError(504, 'GEMINI_TIMEOUT', 'Gemini phản hồi quá lâu. Vui lòng thử lại.');
+        continue;
+      }
+      console.error(`[gemini] network error with model ${modelName}:`, redact(err?.message || err));
+      lastError = new ApiError(502, 'GEMINI_UNREACHABLE', 'Backend không kết nối được tới Gemini API. Kiểm tra mạng của máy chủ.');
+      continue;
+    } finally {
+      clearTimeout(timer);
     }
-    res = result.response;
-    data = result.body;
-  } catch (err) {
-    if (err?.name === 'AbortError') throw new ApiError(504, 'GEMINI_TIMEOUT', 'Gemini phản hồi quá lâu. Vui lòng thử lại.');
-    console.error('[gemini] network error:', redact(err?.message || err));
-    throw new ApiError(502, 'GEMINI_UNREACHABLE', 'Backend không kết nối được tới Gemini API. Kiểm tra mạng của máy chủ.');
-  } finally {
-    clearTimeout(timer);
+
+    if (!res.ok) {
+      if (res.status === 503 || res.status === 404) {
+        console.warn(`[gemini] Model ${modelName} returned HTTP ${res.status}. Trying next fallback model...`);
+        lastError = mapUpstreamError(res.status, data);
+        continue;
+      }
+      throw mapUpstreamError(res.status, data);
+    }
+
+    const candidate = data?.candidates?.[0];
+    const text = (candidate?.content?.parts ?? [])
+      .filter((p) => typeof p?.text === 'string' && !p.thought)
+      .map((p) => p.text)
+      .join('')
+      .trim();
+    if (text) return text;
+
+    if (data?.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY') {
+      throw new ApiError(422, 'GEMINI_BLOCKED', 'Gemini từ chối trả lời nội dung này. Hãy thử diễn đạt khác.');
+    }
   }
 
-  if (!res.ok) throw mapUpstreamError(res.status, data);
-
-  const candidate = data?.candidates?.[0];
-  const text = (candidate?.content?.parts ?? [])
-    .filter((p) => typeof p?.text === 'string' && !p.thought)
-    .map((p) => p.text)
-    .join('')
-    .trim();
-  if (text) return text;
-
-  if (data?.promptFeedback?.blockReason || candidate?.finishReason === 'SAFETY') {
-    throw new ApiError(422, 'GEMINI_BLOCKED', 'Gemini từ chối trả lời nội dung này. Hãy thử diễn đạt khác.');
-  }
+  if (lastError) throw lastError;
   throw new ApiError(502, 'GEMINI_EMPTY', 'Gemini không trả về nội dung. Vui lòng thử lại.');
 }
 

@@ -11,8 +11,8 @@ const int = (v, d) => {
 export const config = {
   host: (process.env.HOST || '127.0.0.1').trim(),
   port: int(process.env.PORT, 8787),
-  apiKey: (process.env.GEMINI_API_KEY || '').trim(),
-  model: (process.env.GEMINI_MODEL || 'gemini-3.8-flash').trim(),
+  apiKey: (process.env.GEMINI_API_KEY || '').trim().replace(/^["']|["']$/g, '').trim(),
+  model: (process.env.GEMINI_MODEL || 'gemini-3.5-flash').trim(),
   // "none" = không gửi tham số thinkingLevel (dùng khi model không hỗ trợ)
   thinkingLevel: (process.env.GEMINI_THINKING_LEVEL ?? 'low').trim().toLowerCase(),
   // Cho phép đổi để kiểm thử với máy chủ giả; mặc định là API chính thức.
