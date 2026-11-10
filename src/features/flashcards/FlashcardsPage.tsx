@@ -1,5 +1,4 @@
 import {
-  BookOpen,
   Calendar,
   CheckCircle2,
   Edit3,
@@ -13,6 +12,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { BioluminescentCoralIllustration, ShellPearlNauticalIcon } from '../../components/illustrations/OceanIllustrations';
 import PageTitle from '../../components/ui/PageTitle';
 import { deleteDeck, listDecks, updateCardStatus } from '../../services/flashcardStorage';
 import { Deck } from '../../types';
@@ -108,7 +108,7 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
 
   const handleDeleteDeck = (deck: Deck) => {
     const confirmed = window.confirm(
-      `Bạn có chắc chắn muốn xóa bộ thẻ "${deck.title}"?\nToàn bộ ${deck.cards.length} thẻ flashcard và dữ liệu ôn tập sẽ bị xóa vĩnh viễn.`
+      `Xóa bộ thẻ san hô "${deck.title}"?\nToàn bộ ${deck.cards.length} thẻ flashcard sẽ bị xóa.`
     );
     if (!confirmed) return;
 
@@ -126,7 +126,6 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
     refreshDecks();
   };
 
-  // Màn hình Study 3D Flip
   if (activeView === 'study' && selectedDeck) {
     return (
       <FlashcardStudyView
@@ -140,7 +139,6 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
     );
   }
 
-  // Màn hình Quiz Trắc nghiệm
   if (activeView === 'quiz' && selectedDeck) {
     return (
       <QuizStudyView
@@ -151,62 +149,62 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
   }
 
   return (
-    <div className="stack flashcards-page">
+    <div className="stack flashcards-page ocean-flashcards-page">
       <PageTitle
-        icon={<GraduationCap size={22} />}
-        title="Không gian Ôn tập & Flashcards"
-        subtitle="Học chủ động với thẻ ghi nhớ Spaced Repetition và bài tập trắc nghiệm thông minh"
+        icon={<ShellPearlNauticalIcon size={24} />}
+        title="Lặn Ngắm Rạn San Hô & Ôn Tập 3D"
+        subtitle="Học chủ động Active Recall dưới đáy biển sâu với thẻ 3D và bài trắc nghiệm san hô"
       />
 
-      {/* Hero Banner với Thống kê */}
-      <section className="flashcards-hero">
+      {/* Ocean Coral Reef Hero */}
+      <section className="flashcards-hero ocean-coral-hero">
         <div className="flashcards-hero-copy">
           <span className="flashcards-eyebrow">
-            <Sparkles size={15} /> Phương pháp Active Recall & Spaced Repetition
+            <Sparkles size={15} /> Rạn San Hô Tri Thức & Spaced Repetition
           </span>
-          <h3>Ghi nhớ sâu kiến thức trọng tâm</h3>
+          <h3>Lặn Sâu Khám Phá Kiến Thức Trọng Tâm</h3>
           <p>
-            Biến tài liệu học tập thành hệ thống thẻ ghi nhớ thông minh. Tự tạo bộ thẻ hoặc nhờ AI phân tích đề cương để
-            chuẩn bị cho kỳ thi một cách tự tin.
+            Đúc kết tài liệu thành những vỏ sò ngọc trai ghi nhớ sâu sắc. Lật thẻ phản quang 3D và
+            kiểm tra trí nhớ với bài trắc nghiệm hải trình tự động.
           </p>
         </div>
 
-        <div className="flashcards-hero-stats" aria-label="Thống kê ôn tập">
+        <div className="flashcards-hero-stats ocean-stats-badge" aria-label="Thống kê ôn tập">
           <div className="hero-stat-item">
             <strong>{totalDecks}</strong>
-            <span>Bộ thẻ (Decks)</span>
+            <span>Nhánh san hô</span>
           </div>
           <div className="hero-stat-item">
             <strong>{totalCards}</strong>
-            <span>Thẻ Flashcard</span>
+            <span>Vỏ sò Flashcard</span>
           </div>
           <div className="hero-stat-item mastered-stat">
             <strong>{totalMastered}</strong>
-            <span>Đã ghi nhớ</span>
+            <span>Ngọc trai ghi nhớ</span>
           </div>
           {totalQuizzes > 0 && (
             <div className="hero-stat-item">
               <strong>{totalQuizzes}</strong>
-              <span>Câu trắc nghiệm</span>
+              <span>Câu hỏi biển sâu</span>
             </div>
           )}
         </div>
 
-        <div className="flashcards-hero-mark">
-          <GraduationCap size={96} strokeWidth={1.1} />
+        <div className="ocean-hero-chest-illustration">
+          <BioluminescentCoralIllustration width={180} height={120} />
         </div>
       </section>
 
       {/* Toolbar: Tìm kiếm + Nút Tạo mới */}
-      <div className="flashcards-toolbar card">
+      <div className="flashcards-toolbar card ocean-card">
         <div className="flashcards-toolbar-left">
-          <label className="flashcards-search">
+          <label className="flashcards-search ocean-search">
             <Search size={17} />
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm kiếm bộ thẻ theo tên, tài liệu nguồn, mô tả..."
+              placeholder="Tìm kiếm bộ thẻ san hô..."
               aria-label="Tìm kiếm bộ thẻ"
             />
           </label>
@@ -215,38 +213,38 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
         <div className="flashcards-toolbar-right">
           {onNavigateToDocuments && (
             <button
-              className="btn ghost sm"
+              className="btn ghost sm ocean-btn-ghost"
               onClick={onNavigateToDocuments}
-              title="Mở thư viện tài liệu để AI tạo flashcard từ PDF"
+              title="Mở kho báu tài liệu để AI trích xuất flashcards tự động"
             >
-              <FileText size={15} /> Thư viện tài liệu
+              <FileText size={15} /> Kho báu tài liệu
             </button>
           )}
-          <button className="btn primary" onClick={handleCreateDeck}>
-            <Plus size={16} /> Tạo bộ thẻ mới
+          <button className="btn ocean-btn" onClick={handleCreateDeck}>
+            <Plus size={16} /> Tạo Bộ Thẻ Mới
           </button>
         </div>
       </div>
 
       {/* Grid danh sách Deck */}
       {filteredDecks.length === 0 ? (
-        <section className="card flashcards-empty">
+        <section className="card flashcards-empty ocean-empty">
           <div className="flashcards-empty-icon">
-            <BookOpen size={32} />
+            <ShellPearlNauticalIcon size={36} />
           </div>
-          <h3>{search ? 'Không tìm thấy bộ thẻ nào phù hợp' : 'Chưa có bộ thẻ ôn tập nào'}</h3>
+          <h3>{search ? 'Không tìm thấy bộ thẻ san hô phù hợp' : 'Rạn san hô chưa có bộ thẻ nào'}</h3>
           <p className="muted">
             {search
               ? 'Thử thay đổi từ khóa tìm kiếm hoặc bấm nút "Tạo bộ thẻ mới".'
-              : 'Hãy bắt đầu bằng cách tạo bộ thẻ thủ công hoặc sang mục Thư viện tài liệu để AI trích xuất tự động.'}
+              : 'Hãy bắt đầu tạo bộ thẻ thủ công hoặc dùng AI trích xuất tự động từ kho văn thư.'}
           </p>
           <div className="flashcards-empty-actions">
-            <button className="btn primary" onClick={handleCreateDeck}>
-              <Plus size={16} /> Tạo bộ thẻ đầu tiên
+            <button className="btn ocean-btn" onClick={handleCreateDeck}>
+              <Plus size={16} /> Tạo Bộ Thẻ Đầu Tiên
             </button>
             {onNavigateToDocuments && (
-              <button className="btn ghost" onClick={onNavigateToDocuments}>
-                <FileText size={16} /> Xem tài liệu để AI tạo thẻ
+              <button className="btn ghost ocean-btn-ghost" onClick={onNavigateToDocuments}>
+                <FileText size={16} /> Xem Kho Tài Liệu
               </button>
             )}
           </div>
@@ -260,15 +258,15 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
             const progressPercent = cardCount > 0 ? Math.round((masteredCount / cardCount) * 100) : 0;
 
             return (
-              <article key={deck.id} className="card deck-card">
+              <article key={deck.id} className="card deck-card ocean-deck-card">
                 <div className="deck-card-header">
                   {deck.sourceDocumentName ? (
-                    <span className="deck-badge ai" title={`Tạo tự động từ: ${deck.sourceDocumentName}`}>
+                    <span className="deck-badge ai ocean-badge-ai" title={`Tạo tự động từ: ${deck.sourceDocumentName}`}>
                       <FileText size={12} />
                       <span className="deck-badge-text">{deck.sourceDocumentName}</span>
                     </span>
                   ) : (
-                    <span className="deck-badge manual">
+                    <span className="deck-badge manual ocean-badge-manual">
                       <GraduationCap size={12} />
                       <span>Thủ công</span>
                     </span>
@@ -292,17 +290,17 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
                 </div>
 
                 <div className="deck-card-stats">
-                  <div className="deck-stat-badge">
+                  <div className="deck-stat-badge ocean-stat-badge">
                     <Layers size={14} />
                     <span>
                       <strong>{cardCount}</strong> thẻ
                     </span>
                   </div>
                   {quizCount > 0 && (
-                    <div className="deck-stat-badge quiz-stat">
+                    <div className="deck-stat-badge quiz-stat ocean-quiz-badge">
                       <HelpCircle size={14} />
                       <span>
-                        <strong>{quizCount}</strong> câu quiz
+                        <strong>{quizCount}</strong> quiz
                       </span>
                     </div>
                   )}
@@ -312,9 +310,9 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
                         <CheckCircle2 size={12} />
                         <span>Đã thuộc {masteredCount}/{cardCount}</span>
                       </div>
-                      <div className="deck-progress-track">
+                      <div className="deck-progress-track ocean-progress-track">
                         <div
-                          className="deck-progress-bar"
+                          className="deck-progress-bar ocean-progress-bar"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
@@ -325,26 +323,26 @@ export default function FlashcardsPage({ onNavigateToDocuments }: FlashcardsPage
                 <div className="deck-card-footer">
                   <div className="deck-primary-actions">
                     <button
-                      className="btn primary sm deck-action-btn"
+                      className="btn primary sm ocean-btn deck-action-btn"
                       onClick={() => handleStartStudy(deck)}
                       disabled={cardCount === 0}
-                      title={cardCount === 0 ? 'Chưa có thẻ nào' : 'Bắt đầu lật thẻ ôn tập 3D'}
+                      title={cardCount === 0 ? 'Chưa có thẻ nào' : 'Lật vỏ sò ôn tập 3D'}
                     >
                       <Layers size={14} />
-                      <span>Lật thẻ</span>
+                      <span>Lật thẻ 3D</span>
                     </button>
                     {quizCount > 0 ? (
                       <button
-                        className="btn ghost sm deck-action-btn quiz-action-btn"
+                        className="btn ghost sm ocean-btn-ghost deck-action-btn quiz-action-btn"
                         onClick={() => handleStartQuiz(deck)}
-                        title="Bắt đầu làm bài trắc nghiệm tính điểm"
+                        title="Bắt đầu bài trắc nghiệm san hô"
                       >
                         <HelpCircle size={14} />
                         <span>Làm Quiz</span>
                       </button>
                     ) : (
                       <button
-                        className="btn ghost sm deck-action-btn"
+                        className="btn ghost sm ocean-btn-ghost deck-action-btn"
                         onClick={() => handleEditDeck(deck)}
                         title="Chỉnh sửa nội dung bộ thẻ"
                       >

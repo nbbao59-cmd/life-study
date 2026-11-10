@@ -138,3 +138,25 @@ export interface GenerateCardsResponse {
     explanation: string;
   }>;
 }
+
+export interface Track {
+  id: string;
+  title: string;
+  artist: string;
+  album: string;
+  duration: number; // in seconds (e.g. 195 = 3:15)
+  url?: string;      // mp3 or audio stream url
+  youtubeId?: string; // YouTube video ID (e.g. jfKfPfyJRdk)
+  coverUrl?: string;
+  isCustom?: boolean;
+}
+
+export interface Playlist {
+  id: string;
+  name: string;
+  description: string;
+  coverUrl: string;
+  emoji: string;
+  gradient: string;
+  tracks: Track[];
+}

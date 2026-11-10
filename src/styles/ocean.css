@@ -1,0 +1,373 @@
+/* ==========================================================================
+   Ocean / Coastal Harbor Theme Styles & SVG Visuals
+   ========================================================================== */
+
+:root {
+  --ocean-deep: #082f49;
+  --ocean-navy: #0c4a6e;
+  --ocean-primary: #0284c7;
+  --ocean-bright: #38bdf8;
+  --ocean-foam: #e0f2fe;
+  --ocean-mint: #0d9488;
+  --ocean-sand: #fef3c7;
+  --ocean-gold: #fbbf24;
+  --ocean-brass: #b45309;
+  --ocean-coral: #f43f5e;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 80% 0%, rgba(2, 132, 199, 0.09), transparent 38rem),
+    radial-gradient(ellipse at 15% 95%, rgba(12, 74, 110, 0.08), transparent 36rem),
+    radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.03), transparent 50rem),
+    var(--bg);
+}
+
+/* ---------- 1. Sidebar Nautical Sign Board ---------- */
+.ocean-sidebar {
+  background: linear-gradient(180deg, #071e30 0%, #0a253c 60%, #061929 100%) !important;
+  border-right: 1px solid rgba(56, 189, 248, 0.15);
+  box-shadow: 4px 0 28px rgba(3, 20, 36, 0.45);
+}
+
+.ocean-sign-board {
+  position: relative;
+  background: linear-gradient(135deg, #0e3b5e 0%, #09263f 100%);
+  border: 2px solid #fbbf24;
+  border-radius: 20px;
+  padding: 14px 12px 12px;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.25),
+    0 4px 0 #78350f,
+    0 10px 24px rgba(0, 0, 0, 0.4);
+  text-align: center;
+}
+
+.brass-bolt {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fbbf24;
+  border: 1px solid #78350f;
+  box-shadow: inset 0 1px 1px #fff;
+}
+.brass-bolt.top-left { top: 6px; left: 6px; }
+.brass-bolt.top-right { top: 6px; right: 6px; }
+.brass-bolt.btm-left { bottom: 6px; left: 6px; }
+.brass-bolt.btm-right { bottom: 6px; right: 6px; }
+
+.ocean-sign-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.compass-badge-wrap {
+  margin-bottom: 2px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+}
+
+.ocean-sign-eyebrow {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #fde047;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ocean-sign-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 900;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.ocean-sign-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(2, 132, 199, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #e0f2fe;
+  margin-top: 4px;
+}
+
+.spin-slow {
+  animation: spinSlow 20s linear infinite;
+}
+
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.ocean-mascot-card {
+  margin-top: auto;
+  background: rgba(14, 59, 94, 0.45);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 18px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ---------- 2. Ocean Dashboard Elements ---------- */
+.ocean-badge-icon {
+  font-size: 16px;
+  filter: drop-shadow(0 2px 4px rgba(2, 132, 199, 0.2));
+}
+
+.ocean-harbor-card {
+  border-color: rgba(2, 132, 199, 0.18) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 249, 255, 0.9)) !important;
+}
+
+.ocean-beacon-banner {
+  background: rgba(2, 132, 199, 0.08) !important;
+  border: 1px solid rgba(2, 132, 199, 0.2) !important;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.ocean-cal-widget {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(2, 132, 199, 0.15);
+}
+
+.ocean-today-cell {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
+}
+
+.ocean-task-ico {
+  color: #0284c7;
+}
+
+.ocean-lighthouse-frame {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(8, 32, 62, 0.15);
+}
+
+.ocean-goal-box {
+  background: rgba(2, 132, 199, 0.06);
+  border: 1px solid rgba(2, 132, 199, 0.2);
+  border-radius: 14px;
+  padding: 10px 14px;
+}
+
+.ocean-sailing-art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  position: relative;
+}
+
+.ocean-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(2, 132, 199, 0.12);
+  color: #0284c7;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ocean-avatar-circle {
+  border: 2px solid rgba(56, 189, 248, 0.4);
+  transition: transform 0.18s ease;
+}
+.villager-item:hover .ocean-avatar-circle {
+  transform: scale(1.1);
+  border-color: #0284c7;
+}
+
+.ocean-ai-btn {
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35) !important;
+}
+
+.ocean-note-box {
+  background: #ffffff;
+  border: 1px solid rgba(2, 132, 199, 0.15) !important;
+  border-radius: 16px;
+  transition: all 0.18s ease;
+}
+.ocean-note-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.08);
+}
+
+/* ---------- 3. Ocean Buttons, Chips & Cards ---------- */
+.ocean-btn {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3) !important;
+  border: none !important;
+}
+.ocean-btn:hover {
+  background: #0369a1 !important;
+  transform: translateY(-1px);
+}
+
+.ocean-btn-ghost {
+  background: rgba(2, 132, 199, 0.08) !important;
+  color: #0284c7 !important;
+  border: 1px solid rgba(2, 132, 199, 0.25) !important;
+}
+.ocean-btn-ghost:hover {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+.ocean-chip {
+  border-color: rgba(2, 132, 199, 0.2) !important;
+  color: #0c4a6e !important;
+}
+.ocean-chip.on {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+.ocean-check.on {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+}
+
+.ocean-card {
+  border-color: rgba(226, 232, 240, 0.8) !important;
+}
+
+/* ---------- 4. Sunken Treasure Hero (Documents) ---------- */
+.ocean-treasure-hero {
+  background: linear-gradient(115deg, #082f49 0%, #0c4a6e 50%, #0369a1 100%) !important;
+  box-shadow: 0 16px 36px rgba(8, 47, 73, 0.24) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.ocean-hero-chest-illustration {
+  flex: none;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.35));
+}
+
+.ocean-dropzone {
+  border: 2px dashed #38bdf8 !important;
+  background: rgba(240, 249, 255, 0.6) !important;
+}
+.ocean-dropzone.dragging {
+  background: rgba(224, 242, 254, 0.85) !important;
+  border-color: #0284c7 !important;
+}
+
+.ocean-upload-icon {
+  background: rgba(2, 132, 199, 0.12) !important;
+  color: #0284c7 !important;
+}
+
+/* ---------- 5. Bioluminescent Coral Hero (Flashcards) ---------- */
+.ocean-coral-hero {
+  background: linear-gradient(115deg, #091e36 0%, #0f3a60 55%, #0284c7 100%) !important;
+  box-shadow: 0 16px 36px rgba(9, 30, 54, 0.26) !important;
+}
+
+.ocean-deck-card {
+  border-color: rgba(2, 132, 199, 0.18) !important;
+  transition: all 0.2s ease;
+}
+.ocean-deck-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(2, 132, 199, 0.1);
+  border-color: #0284c7 !important;
+}
+
+.ocean-progress-bar {
+  background: linear-gradient(90deg, #0284c7, #38bdf8) !important;
+}
+
+.ocean-quiz-badge {
+  background: rgba(244, 63, 94, 0.1) !important;
+  color: #f43f5e !important;
+}
+
+/* ---------- 6. Tidal Rhythm Graph Banner ---------- */
+.ocean-tide-banner {
+  background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 100%) !important;
+  border: 1px solid rgba(2, 132, 199, 0.2) !important;
+  padding: 16px 20px;
+}
+
+.ocean-tl-item.ocean-now {
+  border-color: #0284c7 !important;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15) !important;
+}
+.ocean-tl-time {
+  color: #0284c7 !important;
+}
+
+/* ---------- 7. Pomodoro Ocean Ring & Glasses ---------- */
+.ocean-ring circle:last-of-type {
+  stroke: #0284c7 !important;
+  filter: drop-shadow(0 0 6px rgba(2, 132, 199, 0.4));
+}
+
+.ocean-glass.on {
+  background: #e0f2fe !important;
+  border-color: #38bdf8 !important;
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.35);
+}
+
+.ocean-stretch:hover {
+  border-color: #0284c7 !important;
+  background: rgba(2, 132, 199, 0.04);
+}
+
+/* ---------- 8. YouTube Badge & Chips ---------- */
+.yt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 999px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.yt-link-icon:hover {
+  color: #dc2626 !important;
+  background: #fee2e2 !important;
+}
+
+.yt-chip {
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #e11d48 !important;
+}
+.yt-chip:hover {
+  background: #e11d48 !important;
+  color: #ffffff !important;
+}

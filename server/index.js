@@ -32,7 +32,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && url.pathname === '/api/health') {
-      return sendJson(res, 200, { ok: true, geminiConfigured: isKeyConfigured(), model: config.model }, cors);
+      return sendJson(res, 200, { ok: true, geminiConfigured: isKeyConfigured(), keysCount: config.apiKeys.length, model: config.model }, cors);
     }
 
     if (req.method === 'POST' && url.pathname === '/api/chat') {
@@ -105,7 +105,7 @@ server.on('error', (err) => {
 });
 
 server.listen(config.port, config.host, () => {
-  console.log(`✔ Backend AI chạy tại http://${config.host}:${config.port}  (model: ${config.model})`);
+  console.log(`✔ Backend AI chạy tại http://${config.host}:${config.port} (model: ${config.model}, keys: ${config.apiKeys.length})`);
   if (!isKeyConfigured()) {
     console.warn('⚠ Chưa cấu hình GEMINI_API_KEY: trợ lý AI sẽ báo lỗi cho tới khi bạn điền key vào file .env và khởi động lại.');
   }

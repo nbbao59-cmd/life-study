@@ -1,5 +1,4 @@
 import {
-  BookOpen,
   Download,
   File as FileIcon,
   FileSpreadsheet,
@@ -14,6 +13,7 @@ import {
   Upload,
 } from 'lucide-react';
 import { ChangeEvent, DragEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { SunkenTreasureIllustration } from '../../components/illustrations/OceanIllustrations';
 import PageTitle from '../../components/ui/PageTitle';
 import { listDocuments, readDocument, removeDocument, saveDocument } from '../../services/documentStorage';
 import { DocumentCategory, DocumentItem, SectionId } from '../../types';
@@ -29,16 +29,16 @@ type Notice = { kind: 'success' | 'error'; text: string } | null;
 
 const ACCEPT = '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.md,.rtf,.png,.jpg,.jpeg,.webp';
 const CATEGORY_LABEL: Record<DocumentCategory, string> = {
-  pdf: 'PDF',
-  word: 'Word',
-  sheet: 'Bảng tính',
-  slide: 'Trình chiếu',
-  image: 'Hình ảnh',
-  text: 'Văn bản',
-  other: 'Tệp khác',
+  pdf: 'Hải Đồ PDF',
+  word: 'Văn Thư Word',
+  sheet: 'Bảng Tính',
+  slide: 'Trình Chiếu',
+  image: 'Hình Ảnh',
+  text: 'Văn Bản',
+  other: 'Tệp Khác',
 };
 const FILTERS: { id: Filter; label: string }[] = [
-  { id: 'all', label: 'Tất cả' },
+  { id: 'all', label: 'Tất cả kho báu' },
   { id: 'pdf', label: 'PDF' },
   { id: 'word', label: 'Word' },
   { id: 'sheet', label: 'Bảng tính' },
@@ -156,11 +156,11 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
           text: `${added ? `Đã lưu ${added} tài liệu. ` : ''}Bỏ qua định dạng chưa hỗ trợ: ${rejected.join(', ')}`,
         });
       } else {
-        setNotice({ kind: 'success', text: `Đã lưu ${added} tài liệu an toàn vào bộ nhớ máy tính.` });
+        setNotice({ kind: 'success', text: `Đã lưu an toàn ${added} tệp vào Hầm Ngọc Trai cục bộ.` });
       }
     } catch (err: any) {
       setDocuments(await listDocuments().catch(() => documents));
-      const message = err?.message || 'Không lưu được tệp. Bộ nhớ trình duyệt có thể đã đầy hoặc gặp sự cố.';
+      const message = err?.message || 'Không lưu được tệp. Bộ nhớ máy có thể đã đầy.';
       setNotice({ kind: 'error', text: message });
     } finally {
       setBusy(false);
@@ -190,60 +190,62 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
       link.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     } catch {
-      setNotice({ kind: 'error', text: 'Không đọc được tài liệu. Hãy tải lại trang rồi thử lại.' });
+      setNotice({ kind: 'error', text: 'Không đọc được văn thư. Hãy thử lại.' });
     }
   };
 
   const remove = async (item: DocumentItem) => {
-    if (!window.confirm(`Xóa “${item.name}” khỏi thư viện tài liệu?`)) return;
+    if (!window.confirm(`Xóa văn thư “${item.name}” khỏi kho báu đáy biển?`)) return;
     try {
       await removeDocument(item.id);
       setDocuments((current) => current.filter((document) => document.id !== item.id));
       if (selectedForAi?.id === item.id) {
         setSelectedForAi(null);
       }
-      setNotice({ kind: 'success', text: 'Đã xóa tài liệu khỏi thiết bị này.' });
+      setNotice({ kind: 'success', text: 'Đã xóa tài liệu khỏi hầm ngọc trai.' });
     } catch {
       setNotice({ kind: 'error', text: 'Không xóa được tài liệu. Hãy thử lại.' });
     }
   };
 
   return (
-    <div className="stack document-page">
+    <div className="stack document-page ocean-document-page">
       <PageTitle
-        icon={<BookOpen size={22} />}
-        title="Thư viện tài liệu"
-        subtitle="Lưu đề cương, bài giảng và tài liệu học tập cục bộ an toàn"
+        icon={<FolderOpen size={22} />}
+        title="Kho Báu Văn Thư Đáy Biển"
+        subtitle="Hầm lưu trữ đề cương, bài giảng và tài liệu học tập riêng tư an toàn"
       />
 
-      <section className="document-hero">
+      {/* Ocean Sunken Treasure Hero */}
+      <section className="document-hero ocean-treasure-hero">
         <div className="document-hero-copy">
           <span className="document-eyebrow">
-            <ShieldCheck size={15} /> Lưu trữ riêng tư trên thiết bị (IndexedDB)
+            <ShieldCheck size={15} /> Hầm lưu trữ ngọc trai cục bộ (IndexedDB Bảo Mật)
           </span>
-          <h3>Không gian tài liệu học tập của bạn</h3>
+          <h3>Kho Báu Tri Thức Đáy Biển</h3>
           <p>
-            Tìm lại tài liệu nhanh chóng, tải xuống khi cần, hỏi đáp với AI thông minh và tự động tạo flashcards ôn tập
-            mà không tải lên máy chủ ngoài.
+            Mọi bài giảng, đề thi và sách học của bạn được lưu an toàn tuyệt đối ngay trên máy tính.
+            Hỏi đáp AI tức thì và đúc thành thẻ Flashcard 3D mà không rò rỉ dữ liệu ra ngoài.
           </p>
         </div>
-        <div className="document-hero-stats" aria-label="Thống kê thư viện">
+        <div className="document-hero-stats ocean-stats-badge" aria-label="Thống kê thư viện">
           <div>
             <strong>{documents.length}</strong>
-            <span>Tài liệu</span>
+            <span>Văn thư</span>
           </div>
           <div>
             <strong>{formatBytes(totalSize)}</strong>
-            <span>Đang lưu</span>
+            <span>Dung lượng</span>
           </div>
         </div>
-        <div className="document-hero-mark">
-          <FolderOpen size={96} strokeWidth={1.1} />
+        <div className="ocean-hero-chest-illustration">
+          <SunkenTreasureIllustration width={170} height={120} />
         </div>
       </section>
 
+      {/* Pearl Dredge Net Upload Dropzone */}
       <section
-        className={`document-dropzone ${dragging ? 'dragging' : ''} ${busy ? 'busy' : ''}`}
+        className={`document-dropzone ocean-dropzone ${dragging ? 'dragging' : ''} ${busy ? 'busy' : ''}`}
         onDragOver={(event) => {
           event.preventDefault();
           setDragging(true);
@@ -251,15 +253,15 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
         onDragLeave={() => setDragging(false)}
         onDrop={onDrop}
       >
-        <div className="document-upload-icon">
+        <div className="document-upload-icon ocean-upload-icon">
           <Upload size={22} />
         </div>
         <div className="document-drop-copy">
-          <h3>{busy ? 'Đang lưu tài liệu…' : 'Thêm tài liệu vào thư viện'}</h3>
-          <p>Kéo thả tệp vào đây hoặc chọn từ thiết bị. Hỗ trợ PDF, Word, Excel, PowerPoint, Ảnh và Tệp văn bản.</p>
+          <h3>{busy ? 'Đang đưa văn thư vào hầm ngọc trai…' : 'Kéo thả tệp vào lưới thu thập kho báu'}</h3>
+          <p>Hỗ trợ toàn bộ tài liệu PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), Ảnh và Tệp văn bản.</p>
         </div>
-        <label className="btn document-pick" htmlFor="document-picker">
-          <Upload size={16} /> Chọn tệp
+        <label className="btn ocean-btn document-pick" htmlFor="document-picker">
+          <Upload size={16} /> Chọn Tệp Máy Tính
         </label>
         <input
           ref={inputRef}
@@ -279,22 +281,23 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
         </div>
       )}
 
-      <section className="card document-library">
+      {/* Archive Collection Table */}
+      <section className="card document-library ocean-card">
         <div className="document-toolbar">
           <div>
             <span className="document-eyebrow navy">
-              <FolderOpen size={15} /> BỘ SƯU TẬP
+              <FolderOpen size={15} /> KHO VĂN THƯ
             </span>
-            <h3>Tài liệu của tôi</h3>
-            <p className="muted">Toàn bộ tệp được lưu trong cơ sở dữ liệu IndexedDB của trình duyệt máy bạn.</p>
+            <h3>Tài liệu của bạn</h3>
+            <p className="muted">Toàn bộ tệp nằm trong cơ sở dữ liệu IndexedDB trình duyệt của bạn.</p>
           </div>
-          <label className="document-search">
+          <label className="document-search ocean-search">
             <Search size={17} />
             <input
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Tìm tài liệu theo tên…"
+              placeholder="Tìm kiếm tài liệu…"
               aria-label="Tìm tài liệu"
             />
           </label>
@@ -304,7 +307,7 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
           {FILTERS.map((item) => (
             <button
               key={item.id}
-              className={`chip ${filter === item.id ? 'on' : ''}`}
+              className={`chip ocean-chip ${filter === item.id ? 'on' : ''}`}
               onClick={() => setFilter(item.id)}
               aria-pressed={filter === item.id}
             >
@@ -318,14 +321,14 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
             <span className="document-empty-icon">
               <FolderOpen size={25} />
             </span>
-            <strong>Đang mở thư viện…</strong>
+            <strong>Đang mở hầm kho báu…</strong>
           </div>
         ) : visibleDocuments.length ? (
           <div className="document-list">
             {visibleDocuments.map((item) => {
               const category = categoryFor(item.name);
               return (
-                <article className="document-row" key={item.id}>
+                <article className="document-row ocean-document-row" key={item.id}>
                   <div className={`document-file-icon ${category}`}>{fileIcon(category)}</div>
                   <div className="document-file-info">
                     <strong title={item.name}>{item.name}</strong>
@@ -335,7 +338,7 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
                   </div>
                   <div className="document-actions">
                     <button
-                      className="btn sm ghost document-ai-btn"
+                      className="btn sm ghost document-ai-btn ocean-ai-btn"
                       onClick={() => setSelectedForAi(item)}
                       aria-label={`Hỏi đáp AI với ${item.name}`}
                       title="Hỏi đáp AI & Tạo Flashcards"
@@ -370,20 +373,19 @@ export default function DocumentLibrary({ onNavigate }: DocumentLibraryProps) {
               <FolderOpen size={25} />
             </span>
             <strong>
-              {search || filter !== 'all' ? 'Không tìm thấy tài liệu phù hợp' : 'Thư viện của bạn đang trống'}
+              {search || filter !== 'all' ? 'Không tìm thấy văn thư phù hợp' : 'Hầm kho báu đang trống'}
             </strong>
             <span>
               {search || filter !== 'all'
-                ? 'Thử từ khóa khác hoặc chọn bộ lọc khác.'
-                : 'Kéo thả hoặc chọn tài liệu đầu tiên để bắt đầu sắp xếp góc học tập.'}
+                ? 'Thử từ khóa khác hoặc chọn danh mục khác.'
+                : 'Thả văn thư đầu tiên vào để bắt đầu lưu trữ.'}
             </span>
           </div>
         )}
       </section>
 
       <p className="document-privacy">
-        <ShieldCheck size={14} /> Tài liệu chỉ lưu trữ cục bộ trong IndexedDB của trình duyệt máy bạn, không gửi lên bất
-        kỳ máy chủ nào.
+        <ShieldCheck size={14} /> Văn thư được mã hóa lưu trữ cục bộ trong IndexedDB của bạn, an toàn tuyệt đối.
       </p>
 
       {/* Drawer Hỏi đáp AI */}
