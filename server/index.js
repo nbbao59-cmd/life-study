@@ -8,14 +8,19 @@ import { parseChatRequest, parseDocumentChatRequest, parseGenerateCardsRequest }
 
 const limited = createRateLimiter(config.rateLimitPerMinute);
 
-const server = http.createServer(async (req, res) => {
+export default async function handler(req, res) {
   let cors = {};
   try {
     const url = new URL(req.url ?? '/', 'http://localhost');
+    const pathname = url.pathname.startsWith('/api/')
+      ? url.pathname
+      : `/api${url.pathname.startsWith('/') ? '' : '/'}${url.pathname}`;
     const origin = req.headers.origin;
+    const host = req.headers.host;
+    const isSameHost = origin && host && new URL(origin).host === host;
 
-    if (!url.pathname.startsWith('/api/')) throw new ApiError(404, 'NOT_FOUND', 'Không tìm thấy.');
-    if (!isOriginAllowed(origin, config.allowedOrigins)) {
+    if (!pathname.startsWith('/api/')) throw new ApiError(404, 'NOT_FOUND', 'Không tìm thấy.');
+    if (!isSameHost && !isOriginAllowed(origin, config.allowedOrigins)) {
       throw new ApiError(403, 'FORBIDDEN_ORIGIN', 'Nguồn truy cập không được phép. Thêm origin vào ALLOWED_ORIGINS trong .env.');
     }
     if (origin) {
@@ -31,15 +36,17 @@ const server = http.createServer(async (req, res) => {
       return res.end();
     }
 
-    if (req.method === 'GET' && url.pathname === '/api/health') {
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+
+    if (req.method === 'GET' && pathname === '/api/health') {
       return sendJson(res, 200, { ok: true, geminiConfigured: isKeyConfigured(), keysCount: config.apiKeys.length, model: config.model }, cors);
     }
 
-    if (req.method === 'POST' && url.pathname === '/api/chat') {
+    if (req.method === 'POST' && pathname === '/api/chat') {
       if (!isKeyConfigured()) {
-        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY. Hãy tạo file .env từ .env.example, điền GEMINI_API_KEY rồi khởi động lại backend.');
+        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY.');
       }
-      const wait = limited(req.socket.remoteAddress ?? 'unknown');
+      const wait = limited(clientIp);
       if (wait) {
         res.setHeader('Retry-After', String(wait));
         throw new ApiError(429, 'RATE_LIMITED', `Bạn gửi quá nhanh. Vui lòng thử lại sau ${wait} giây.`);
@@ -53,11 +60,11 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { reply }, cors);
     }
 
-    if (req.method === 'POST' && url.pathname === '/api/document-chat') {
+    if (req.method === 'POST' && pathname === '/api/document-chat') {
       if (!isKeyConfigured()) {
-        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY. Hãy tạo file .env từ .env.example, điền GEMINI_API_KEY rồi khởi động lại backend.');
+        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY.');
       }
-      const wait = limited(req.socket.remoteAddress ?? 'unknown');
+      const wait = limited(clientIp);
       if (wait) {
         res.setHeader('Retry-After', String(wait));
         throw new ApiError(429, 'RATE_LIMITED', `Bạn gửi quá nhanh. Vui lòng thử lại sau ${wait} giây.`);
@@ -72,11 +79,11 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, { reply }, cors);
     }
 
-    if (req.method === 'POST' && url.pathname === '/api/generate-cards') {
+    if (req.method === 'POST' && pathname === '/api/generate-cards') {
       if (!isKeyConfigured()) {
-        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY. Hãy tạo file .env từ .env.example, điền GEMINI_API_KEY rồi khởi động lại backend.');
+        throw new ApiError(503, 'NOT_CONFIGURED', 'Backend chưa có GEMINI_API_KEY.');
       }
-      const wait = limited(req.socket.remoteAddress ?? 'unknown');
+      const wait = limited(clientIp);
       if (wait) {
         res.setHeader('Retry-After', String(wait));
         throw new ApiError(429, 'RATE_LIMITED', `Bạn gửi quá nhanh. Vui lòng thử lại sau ${wait} giây.`);
@@ -96,17 +103,21 @@ const server = http.createServer(async (req, res) => {
     console.error('[server] lỗi không mong đợi:', err);
     return sendJson(res, 500, { error: { code: 'INTERNAL', message: 'Lỗi nội bộ của backend.' } }, cors);
   }
-});
+}
 
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') console.error(`✖ Cổng ${config.port} đang được dùng. Đổi PORT trong .env hoặc tắt tiến trình cũ.`);
-  else console.error('✖ Không khởi động được backend:', err.message);
-  process.exit(1);
-});
+if (!process.env.VERCEL) {
+  const server = http.createServer(handler);
 
-server.listen(config.port, config.host, () => {
-  console.log(`✔ Backend AI chạy tại http://${config.host}:${config.port} (model: ${config.model}, keys: ${config.apiKeys.length})`);
-  if (!isKeyConfigured()) {
-    console.warn('⚠ Chưa cấu hình GEMINI_API_KEY: trợ lý AI sẽ báo lỗi cho tới khi bạn điền key vào file .env và khởi động lại.');
-  }
-});
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') console.error(`✖ Cổng ${config.port} đang được dùng. Đổi PORT trong .env hoặc tắt tiến trình cũ.`);
+    else console.error('✖ Không khởi động được backend:', err.message);
+    process.exit(1);
+  });
+
+  server.listen(config.port, config.host, () => {
+    console.log(`✔ Backend AI chạy tại http://${config.host}:${config.port} (model: ${config.model}, keys: ${config.apiKeys.length})`);
+    if (!isKeyConfigured()) {
+      console.warn('⚠ Chưa cấu hình GEMINI_API_KEY: trợ lý AI sẽ báo lỗi cho tới khi bạn điền key vào file .env và khởi động lại.');
+    }
+  });
+}
